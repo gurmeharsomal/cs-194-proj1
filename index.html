@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Project #1: CS194-26</title>
+<link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&family=Open+Sans&display=swap" rel="stylesheet">
+<style>
+h1{
+    color:#581845;
+    text-align: center;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 30px;}
+h2{
+    color: #7E2363;
+    padding-left: 50px;
+    padding-right:50px;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 20px;}
+
+
+h3 {
+    color: #7E2363;
+    text-align: center;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 30px;
+}
+h4 {
+    color: #7E2363;
+    text-align: center;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 20px;
+}
+h5 {
+    color: #7E2363;
+    text-align: center;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 15px;
+}
+
+p{
+    padding-left: 50px;
+    padding-right:50px;
+    font-size: 14px;
+    font-family: 'Open Sans', sans-serif;}
+
+b {
+  font-weight: bold;
+}
+figure{
+    display:inline-block;
+    font-family: 'Open Sans', sans-serif;}
+</style>
+<link rel="shortcut icon" type="image/x-icon" href="favicon.png"/>
+</head>
+<body>
+<h3>CS 194-26: Fall 2020 <br></h3>
+
+<h1>Project 1: Colorizing the Prokudin-Gorskii photo collection<br></h1>
+
+<h4>Gurmehar Kaur Somal <br>
+</h4>
+<h2>Introduction</h2>
+<p> <br>
+
+    The goal of this assignment is to take the digitized Prokudin-Gorskii glass plate images and, using image processing techniques, automatically produce a color image with as few visual artifacts as possible. In order to do this, I  extracted the three color channel images, placed them on top of each other, and aligned them so that they form a single RGB color image. After stacking, I used other methods to improve the quality of the images including the constast. 
+
+<p><span style="font-weight:bold;"> There are a few stages in the process I ended up using:</span> </p>
+<p> 
+    <b>
+
+1. Channel Split into 3 parts
+</b>
+</p>
+<p> 
+    <b>
+2. Stacking the images to form one colored image
+</b>
+</p>
+
+<p>
+    <b>
+3. Aligning the image using NCC or Pyramid
+</b>
+    
+
+</p>
+<p> 
+    <b>
+4. Cropping the borders of the image
+</b>
+</p>
+<p> 
+    <b>
+5. Using Automatic Edge Detection (Bells and Whistle)
+</b>
+</p>
+<p> 
+    <b>
+6. Using Automatic Contrasting (Bells and Whistle)
+</b>
+</p>
+
+
+
+</p>
+<p style="text-align:center;">
+        <img src="org_emir.jpg" width="350px" text-align=center> 
+
+                              <img src="edged_emir.jpg" width="350px">
+                              <center>
+                <figcaption>Before,     After </figcaption>
+            </center>
+<h2>Methodologies </h2>
+
+
+<p>For the low resolution, jpeg images, I used normalized cross-correlation (NCC) to align the photos. This method was fairly simple and  intuitive. I used the method described in the project description- an exhaustive search, going over a 15-pixel-by-15-pixel window , and calculating the ncc, which is simply a dot product between two normalized vectors: (image1./||image1|| and image2./||image2||). I cropped the borders of the stacked image to eliminate outliers in the alignment from all sides of each color channel. The align function provides the optimal displacement co-ordinates for green and red layer keeping blue layer static, using NCC. Then I displaced the original image by the red and green co-ordinates produced by the align function to get the final colorized image. 
+    <br> 
+    <br> 
+</p>
+
+<p> For high resolution images, tif files, I used an image pyramid alignment of 5 layers for faster alinment and searching.  In the image pyramid, each layer sizing down from the previous layer by a factor 2. It is meant to represent the image at multiple scales, and the processing is done sequentially starting from the coarsest scale (smallest image) and going down the pyramid, updating the total offsets (usinng NCC alignment) iteratively before finding the best offset in the next layer. This method proved to be very efficient and provided great results. 
+    
+    <br> <br>
+
+</p>
+
+<h2> Results on Low Resolution Images using <b> Normal Alignment </b> </h2>
+<p>
+    <center>
+    <figure>
+            <img src="ncc_cathedral.jpeg" width="350px"> 
+            <figcaption>Green shift: (5.0, 2.0)
+Red shift: (12, 3)</figcaption>
+    </figure>
+    <figure>
+            <img src="ncc_tobolsk.jpeg" width="350px">
+            <figcaption>Green shift: (3.0, 3.0)
+Red shift: (6, 3)</figcaption>
+    </figure>
+    <figure>
+            <img src="ncc_monastery.jpeg" width="350px">
+            <figcaption>Green shift: (-3.0, 2.0)
+Red shift: (3, 2)</figcaption>
+    </figure>
+
+</center>
+
+</p>
+
+<p>
+<h2> Results on High Resolution Images using <b> Pyramid Alignment </b></h2>
+<center>
+    <figure>
+            <img src="pyramid_harvesters.jpg" width="350px">
+            <figcaption>Green shift: (79.0, 31.0)
+Red shift: (143.0, 24.0)</figcaption>
+    </figure>
+    <figure>
+            <img src="pyramid_emir.jpg" width="350px">
+            <figcaption>Green shift: (63.0, 31.0)
+Red shift: (35.0, -270.0)</figcaption>
+    </figure>
+    <figure>
+            <img src="pyramid_self_portrait.jpg" width="350px">
+            <figcaption>Green shift: (88.0, 47.0)
+Red shift: (191.0, 47.0)</figcaption>
+    </figure>
+    <figure>
+            <img src="pyramid_castle.jpg" width="350px">
+            <figcaption>Green shift: (47.0, 0.0)
+Red shift: (111.0, 0.0)</figcaption>
+    </figure>
+    <figure>
+            <img src="pyramid_melons.jpg" width="350px">
+            <figcaption>Green shift: (95.0, 24.0)
+Red shift: (191.0, -14.0)</figcaption>
+    </figure>
+    <figure>
+            <img src="pyramid_onion_church.jpg" width="350px">
+            <figcaption>Green shift: (56.0, 47.0)
+Red shift: (123.0, 33.0)</figcaption>
+    </figure>
+    <figure>
+            <img src="pyramid_icon.jpg" width="350px">
+            <figcaption>Green shift: (63.0, 31.0)
+Red shift: (111.0, 31.0)</figcaption>
+    </figure>
+    <figure>
+            <img src="pyramid_train.jpg" width="350px">
+            <figcaption>Green shift: (63.0, 0.0)
+Red shift: (95.0, 32.0)</figcaption>
+    </figure>
+    <figure>
+            <img src="pyramid_lady.jpg" width="350px">
+            <figcaption>Green shift: (63.0, -6.0)
+Red shift: (111.0, -30.0)</figcaption>
+    </figure>
+    <figure>
+            <img src="pyramid_workshop.jpg" width="350px">
+            <figcaption>Green shift: (63.0, 3.0)
+Red shift: (111.0, -46.0)</figcaption>
+    </figure>
+    <figure>
+            <img src="pyramid_three_generations.jpg" width="350px">
+            <figcaption>Green shift: (79.0, 31.0)
+Red shift: (143.0, 24.0)</figcaption>
+    </figure>
+
+    </center>
+    
+</p>
+
+<p>
+
+<h3> Bells and Whistles (Extra Credit) </h3>
+
+<h2> Auto Contrast </h2>
+
+<p>
+    In order to improve the difference in color of the images, I defined a function that would take in an image and rescale the image after stretching or shrinking its intensity levels. I did this by calculating the pixel values at the 10.5 percentile and the 80.5 percentile and used the function mentioned to scale the values in the array to the range between the percentile range provided. The results show a drastic change in intensity levels of the image and sometimes provide an aesthetic appeal. 
+
+
+</p>
+
+
+<h2> Automatic Edge Detection </h2>
+
+<p>
+        As shown in the Colorized Emir and Melons images using Pyramid Alignment, the photos lack accurate alignment due to difference in brightness of the channels in the images. This motivated me to use an edge detection function in order to align the images properly. I used <a href="https://docs.opencv.org/trunk/da/d22/tutorial_py_canny.html"> OpenCV's Canny edge detection algorithm</a>, which finds edges in the input image and marks them in the output map edges using the Canny algorithm. 
+
+</p>
+
+
+<h2> Results on High Resolution Images using  Pyramid Alignment and Egde Detection</h2>
+
+
+
+<p style="text-align:center;">
+        <img src="org_emir.jpg" width="350px" text-align=center> 
+                              <img src="edged_emir.jpg" width="350px">
+                              <center>
+                <figcaption>G offset: (56.0, 23.0)
+R offset: (111.0, 39.0) </figcaption>
+            </center>
+
+        
+</p>
+
+<center>
+
+<p style="text-align:center;">
+        <img src="org_melons.jpg" width="350px" text-align=center> 
+                              <img src="edged_melons.jpg" width="350px">
+                              <center>
+                <figcaption>G offset: (89.0, 20.0)
+R offset: (186.0, 12.0)</figcaption>
+            </center>
+
+        
+</p>
+
+</center>
+
+
+
+<center>
+<p style="text-align:center;">
+
+            <img src="org_icon.jpg" width="350px" text-align=center>
+            
+
+                <img src="edged_icon.jpg" width="350px">
+                              <center>
+                <figcaption>G offset: (56.0, 24.0)
+R offset: (107.0, 25.0)</figcaption>
+            </center>
+                               
+</p>
+</center>
+
+
+
+</p>
+    
+
+<h2> Results on High Resolution Images using Pyramid Alignment and <b>Egde Detection</b> and <b>Auto Contrasting</b></h2>
+
+
+
+
+<p style="text-align:center;">
+
+        <img src="org_emir.jpg" width="350px" text-align=center> 
+
+                              <img src="edged_contrast_emir.jpg" width="350px">
+                               
+</p>
+
+
+
+
+
+<center>
+<p style="text-align:center;">
+        <figure>
+            <img src="org_icon.jpg" width="350px" text-align=center>
+            
+        </figure>
+         
+
+                              <img src="edged_contrast_icon.jpg" width="350px">
+                               
+</p>
+</center>
+
+
+
+
+
+
+<h3> Custom Images </h3>
+
+
+<h2>Custom Images using <b>Edge Detection </b></h2>
+<p>
+<center>
+        
+    
+    <figure>
+            <img src="edged_roses.jpg" width="270px">
+            <figcaption><small>G offset: (57.0, -6.0)
+R offset: (111.0, -17.0) </small></small></figcaption>
+    </figure>
+    <figure>
+            <img src="edged_flowers.jpg" width="270px">
+            <figcaption> <small>G offset: (73.0, 14.0)
+R offset: (157.0, 14.0) </small></figcaption>
+    </figure>
+    <figure>
+            <img src="edged_spike.jpg" width="270px">
+            <figcaption> <small>G offset: (44.0, 29.0)
+R offset: (128.0, 33.0)</small></figcaption>
+    </figure>
+
+
+</p>
+
+<p>
+    <figure>
+            <img src="edged_maison.jpg" width="270px">
+            <figcaption><small>G offset: (89.0, 24.0)
+R offset: (169.0, 11.0)</small></figcaption>
+    </figure>
+
+  </center>  
+</p>
+<h2>Custom Images using <b>Edge Detection </b>and <b>Auto Contrast </b></h2>
+<center>
+
+    <figure>
+            <img src="edged_contrast_flowers.jpg" width="270px">
+
+    </figure>
+    <figure>
+            <img src="edged_contrast_spike.jpg" width="270px">
+
+    </figure>
+
+    
+
+    </center>
+
+</p>
+
+<h2>Issues I ran into: </h2>
+<p> 1. I noticed that after stacking the 3 channels, the alignment was extremely noisy and some color channels had different borders to others. This innaccuracy affected my algorithm and prevented it from returning clean results in some 
+    cases. Therefore, I cropped the borders of the stacked image to eliminate outliers in the alignment from all sides of each color channel and then aligned the image. 
+    <br> <br>
+    2. Another issue I faced was with melons.tif and emir.tif where the pyramid function with 5 levels wasn't able to provide clean and precise images. Therefore, I used the Canny edge detection algorithm in order to align the channels properly.
+</p>
+
+<br>
+
+<h2>Credit for the Website Template: Megan Lee. </h2><br>
+
+
+
+
+
+</body>
+</html>
